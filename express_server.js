@@ -9,26 +9,46 @@ const generateRandomString = () => {
   };
 
 
+  console.log("test1", generateRandomString())
 const urlDatabase = {
     "b2xVn2" : "http://www.lighthouselabs.ca",
     "9sm5xK" : "http://www.google.com"
 };
 
-
 app.post("/urls/:id/delete" , (req, res) => {
     const id = req.params.id;
     delete urlDatabase[id];
-    res.redirect("/urls")
+    return res.redirect("/urls")
 });
 
+
 app.get("/urls/new", (req, res) => {
-    res.render("urls_new");
+    return res.render("urls_new");
   });
 
 app.get("/urls", (req, res) => {
     const templateVars = {urls: urlDatabase};
     return res.render("urls_index", templateVars);
 });
+
+app.get("/urls/:id", (req, res) => {
+    const templateVars = {id: req.params.id, longURL: urlDatabase[req.params.id]}
+    return res.render("urls_show", templateVars);
+});
+
+app.post("/urls/:id", (req, res) => {
+    const id = req.params.id;
+    urlDatabase[id] = req.body.longURL
+    return res.redirect("/urls");
+});
+
+app.post("/urls/:id/edit", (req, res) => {
+   const id = req.params.id
+   const longURL = urlDatabase[id]
+   return res.redirect(`/urls/${id}`)
+});
+
+
 
 app.post("/urls", (req, res) => {
     const id = generateRandomString();
@@ -37,18 +57,12 @@ app.post("/urls", (req, res) => {
     return res.redirect(`/urls/${id}`);
 });
 
-app.get("/urls/:id", (req, res) => {
-    const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id]}
-    return res.render("urls_show", templateVars);
-  });
-
-  app.get("/u/:id", (req, res) => {
+app.get("/u/:id", (req, res) => {
     const id = req.params.id;
     const longURL = urlDatabase[id];
     return res.redirect(longURL);
-  })
+})
 
- 
 
 
 
