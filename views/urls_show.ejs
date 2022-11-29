@@ -9,10 +9,10 @@
       crossorigin="anonymous"
     />
     <title>URL - TinyApp Example</title>
-    <%- include ('partials/_header') %>
   </head>
 
   <body>
+    <%- include ('partials/_header') %>
     <div class="card text-center">
       <div class="card-header"></div>
       <div class="card-body">
@@ -20,7 +20,6 @@
         <p class="card-text">
           Short URL ID: <a href="/u/<%= id %>"><%= id %></a>
         </p>
-        New URL:<a href="#"></a>
       </div>
       <div class="card-footer text-muted"></div>
     </div>
