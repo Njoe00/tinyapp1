@@ -2,6 +2,11 @@ const express = require("express");
 const app = express();
 const PORT = 8080;
 app.set("view engine", "ejs");
+app.use(express.urlencoded({extended:true}));
+
+const generateRandomStringconst = () => {
+    return (Math.random() + 1).toString(36).substring(6);
+  };
 
 
 const urlDatabase = {
@@ -18,7 +23,10 @@ app.get("/urls", (req, res) => {
     return res.render("urls_index", templateVars);
 });
 
-
+app.post("/urls", (req, res) => {
+    console.log(req.body);
+    res.send("Ok");
+});
 
 app.get("/urls/:id", (req, res) => {
     const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id]}
@@ -26,6 +34,18 @@ app.get("/urls/:id", (req, res) => {
   });
 
  
+
+
+
+
+
+
+
+
+
+
+
+
 
 app.get("/", (req, res) => {
     res.send("Hello!");
