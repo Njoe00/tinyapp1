@@ -4,7 +4,7 @@ const PORT = 8080;
 app.set("view engine", "ejs");
 app.use(express.urlencoded({extended:true}));
 
-const generateRandomStringconst = () => {
+const generateRandomString = () => {
     return (Math.random() + 1).toString(36).substring(6);
   };
 
@@ -24,8 +24,10 @@ app.get("/urls", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-    console.log(req.body);
-    res.send("Ok");
+    const id = generateRandomString();
+    const longURL = req.body.longURL;
+    urlDatabase[id] = longURL;
+    return res.redirect(`/urls/${id}`);
 });
 
 app.get("/urls/:id", (req, res) => {
