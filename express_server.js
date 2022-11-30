@@ -84,17 +84,25 @@ app.post("/register", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  const id = generateRandomString();
   const email = req.body.email;
-  const password = req.body.password;
-  users[id] = {id, email, password};
-  res.cookie("user_id", id);
-  return res.redirect("/urls");
+  for (let key in users) {
+    if (getUserByEmail(email)) {
+      const password = req.body.password;
+      if (users[key].password === password) {
+        const id = req.params.id;
+        res.cookie("user_id", id);
+        return res.redirect("/urls");
+      }
+    }
+
+  }
+  return res.send("Error Code 403 password or email is incorrect");
+  
 });
 
 app.get("/login", (req, res) => {
-    return res.render("urls_login");
-})
+  return res.render("urls_login");
+});
 
 app.post("/logout", (req, res) => {
   userId = req.cookies.user_id;
