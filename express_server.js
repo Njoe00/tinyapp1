@@ -49,6 +49,13 @@ app.get("/urls", (req, res) => {
   return res.render("urls_index", templateVars);
 });
 
+app.post("/urls", (req, res) => {
+    const id = generateRandomString();
+    const longURL = req.body.longURL;
+    urlDatabase[id] = longURL;
+    return res.redirect(`/urls/${id}`);
+  });
+
 app.post("/urls/:id/delete" , (req, res) => {
   const id = req.params.id;
   delete urlDatabase[id];
@@ -64,6 +71,9 @@ app.get("/urls/new", (req, res) => {
 app.get("/register", (req, res) => {
   const userId = req.cookies.user_id;
   const templateVars = {username: userId};
+  if (userId) {
+    return res.redirect("/urls");
+  }
   return res.render("urls_register", templateVars);
 });
 
@@ -100,6 +110,9 @@ app.post("/login", (req, res) => {
 app.get("/login", (req, res) => {
   const userId = req.cookies.user_id;
   const templateVars = {username: userId};
+  if (userId) {
+    return res.redirect("/urls");
+  }
   return res.render("urls_login", templateVars);
 });
 
@@ -129,13 +142,6 @@ app.post("/urls/:id", (req, res) => {
   return res.redirect(`/urls/${id}`);
 });
 
-
-app.post("/urls", (req, res) => {
-  const id = generateRandomString();
-  const longURL = req.body.longURL;
-  urlDatabase[id] = longURL;
-  return res.redirect(`/urls/${id}`);
-});
 
 app.get("/u/:id", (req, res) => {
   const id = req.params.id;
