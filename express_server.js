@@ -50,16 +50,16 @@ app.get("/urls", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-    const user_id = req.cookies.user_id;
+  const user_id = req.cookies.user_id;
     
-    if (user_id) {
-        const id = generateRandomString();
-        const longURL = req.body.longURL;
-        urlDatabase[id] = longURL;
-        return res.redirect(`/urls/${id}`);
-    }
-    return res.send("You must have account to shorten URLS \n");
-  });
+  if (user_id) {
+    const id = generateRandomString();
+    const longURL = req.body.longURL;
+    urlDatabase[id] = longURL;
+    return res.redirect(`/urls/${id}`);
+  }
+  return res.send("You must have account to shorten URLS \n");
+});
 
 app.post("/urls/:id/delete" , (req, res) => {
   const id = req.params.id;
@@ -155,7 +155,10 @@ app.post("/urls/:id", (req, res) => {
 app.get("/u/:id", (req, res) => {
   const id = req.params.id;
   const longURL = urlDatabase[id];
-  return res.redirect(longURL);
+  if (longURL) {
+    return res.redirect(longURL);
+  }
+  return res.send("This shortened URL does not exist");
 });
 
 
