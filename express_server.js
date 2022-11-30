@@ -84,13 +84,16 @@ app.post("/register", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  const user_id = generateRandomString();
-  res.cookie("user_id", user_id);
+  const id = generateRandomString();
+  const email = req.body.email;
+  const password = req.body.password;
+  users[id] = {id, email, password};
+  res.cookie("user_id", id);
   return res.redirect("/urls");
 });
 
 app.get("/login", (req, res) => {
-    res.render("urls_login");
+    return res.render("urls_login");
 })
 
 app.post("/logout", (req, res) => {
@@ -132,6 +135,13 @@ app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[id];
   return res.redirect(longURL);
 });
+
+
+
+
+
+
+
 
 
 
