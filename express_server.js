@@ -46,13 +46,14 @@ app.post("/urls/:id/delete" , (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-    const templateVars = {username: req.cookies["username"]}
+    const username = req.cookies.user_id;
+    const templateVars = {username: users[username]};
     return res.render("urls_new", templateVars);
 });
 
 app.get("/register", (req, res) => {
-    const username = req.cookies.username
-    const templateVars = {username}
+    const user_id = req.cookies.user_id
+    const templateVars = {user_id}
     return res.render("urls_register", templateVars)
 });
 
@@ -61,14 +62,13 @@ app.post("/register", (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
     users[id] = {id, email, password};
-    console.log(users)
     res.cookie("user_id", id)
     res.redirect("/urls")
 })
 
 app.post("/login", (req, res) => {
-    const username = req.body.username
-    res.cookie("username", username);
+    const user_id = generateRandomString();
+    res.cookie("user_id", user_id);
     res.redirect("/urls");
 });
 
