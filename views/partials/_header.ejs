@@ -25,16 +25,11 @@
         <button type="submit" class="btn btn-primary">Logout</button>
         </form>
         <% } else {%> 
-        <form class="form-inline" action="/login" method="POST">
-          <div class="form-group mb-2">
-            <input
-              class="form-control"
-              type="text"
-              name="username"
-              placeholder="username"
-              style="width: 250; margin: 1em"
-            />
+        <form class="form-inline" action="/login" method="GET">
             <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+        <form class="form-inline" action="/register" method="GET">
+            <button type="submit" class="btn btn-primary">register</button>
         </form>
         <% } %>
       </div>

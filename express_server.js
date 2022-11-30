@@ -75,12 +75,12 @@ app.post("/register", (req, res) => {
   if (email === "" || password === "") {
     return res.send("Status Code 400");
   }
-  if(!getUserByEmail(email)) {
+  if (!getUserByEmail(email)) {
     users[id] = {id, email, password};
     res.cookie("user_id", id);
     return res.redirect("/urls");
   }
-    return res.send("Status Code 400");
+  return res.send("Status Code 400");
 });
 
 app.post("/login", (req, res) => {
@@ -88,6 +88,10 @@ app.post("/login", (req, res) => {
   res.cookie("user_id", user_id);
   return res.redirect("/urls");
 });
+
+app.get("/login", (req, res) => {
+    res.render("urls_login");
+})
 
 app.post("/logout", (req, res) => {
   userId = req.cookies.user_id;
