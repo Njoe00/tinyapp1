@@ -37,6 +37,13 @@ app.get("/urls/new", (req, res) => {
     return res.render("urls_new", templateVars);
 });
 
+
+app.get("/register", (req, res) => {
+    const username = req.cookies.username
+    const templateVars = {username}
+    return res.render("urls_register", templateVars)
+})
+
 app.post("/login", (req, res) => {
     const username = req.body.username
     res.cookie("username", username);
@@ -81,14 +88,6 @@ app.get("/u/:id", (req, res) => {
     const longURL = urlDatabase[id];
     return res.redirect(longURL);
 });
-
-
-
-
-
-
-
-
 
 
 
