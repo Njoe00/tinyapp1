@@ -25,13 +25,11 @@
         <button type="submit" class="btn btn-primary">Logout</button>
         </form>
         <% } else {%> 
-        <form class="form-inline" action="/login" method="GET">
-            <button type="submit" class="btn btn-primary">Login</button>
-        </form>
-        <form class="form-inline" action="/register" method="GET">
-            <button type="submit" class="btn btn-primary">register</button>
-        </form>
-        <% } %>
+        <div class="navbar-nav">
+          <a class="nav-item nav-link" href="/register">register</a>
+          <a class="nav-item nav-link" href="/login">login</a>
+      </div>
+      <% } %>
       </div>
     </nav>
   </header>
