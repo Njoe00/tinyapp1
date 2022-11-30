@@ -50,10 +50,15 @@ app.get("/urls", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-    const id = generateRandomString();
-    const longURL = req.body.longURL;
-    urlDatabase[id] = longURL;
-    return res.redirect(`/urls/${id}`);
+    const user_id = req.cookies.user_id;
+    
+    if (user_id) {
+        const id = generateRandomString();
+        const longURL = req.body.longURL;
+        urlDatabase[id] = longURL;
+        return res.redirect(`/urls/${id}`);
+    }
+    return res.send("You must have account to shorten URLS \n");
   });
 
 app.post("/urls/:id/delete" , (req, res) => {
@@ -64,8 +69,12 @@ app.post("/urls/:id/delete" , (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   const userId = req.cookies.user_id;
-  const templateVars = {username: users[userId]};
-  return res.render("urls_new", templateVars);
+
+  if (userId) {
+    const templateVars = {username: users[userId]};
+    return res.render("urls_new", templateVars);
+  }
+  return res.redirect("/login");
 });
 
 app.get("/register", (req, res) => {
