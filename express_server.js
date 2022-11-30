@@ -19,7 +19,6 @@ const urlDatabase = {
 
 app.get("/urls", (req, res) => {
     const username = req.cookies.username
-    console.log(req.cookies);
     const templateVars = {
         urls: urlDatabase, 
         username
@@ -50,9 +49,7 @@ app.post("/logout", (req, res) => {
 })
 
 app.get("/urls/:id", (req, res) => {
-    console.log("cookies", req.cookies);
     const username = req.cookies.username;
-    console.log("test2", req.cookies)
     const id = req.params.id;
     const longURL = urlDatabase[id];
     const templateVars = {id, longURL, username};
