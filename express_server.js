@@ -63,7 +63,7 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/register", (req, res) => {
   const userId = req.cookies.user_id;
-  const templateVars = {userId};
+  const templateVars = {username: userId};
   return res.render("urls_register", templateVars);
 });
 
@@ -98,11 +98,13 @@ app.post("/login", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  return res.render("urls_login");
+    const userId = req.cookies.user_id;
+    const templateVars = {username: userId}
+  return res.render("urls_login", templateVars);
 });
 
 app.post("/logout", (req, res) => {
-  user_id = req.cookies.user_id;
+  const user_id = req.cookies.user_id;
   res.clearCookie("user_id", user_id);
   return res.redirect("/login");
 });
