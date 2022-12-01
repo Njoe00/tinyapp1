@@ -86,6 +86,17 @@ app.post("/urls", (req, res) => {
 
 app.post("/urls/:id/delete" , (req, res) => {
   const id = req.params.id;
+  const user_id = req.cookies.user_id;
+  if (!user_id) {
+    return res.send("Error you cannot delete this URL because you are not logged in.\n");
+  }
+  if (urlDatabase[id] === undefined) {
+    return res.send("Error you cannot delete this URL because it does not exist.\n");
+  }
+  console.log("user", user_id, "database", urlDatabase[id].userID)
+  if(user_id !== urlDatabase[id].userID) {
+    return res.send("Error you cannot delete this URL because it does not belong to you.\n");
+  }
   delete urlDatabase[id];
   return res.redirect("/urls");
 });
@@ -157,7 +168,7 @@ app.post("/logout", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   const user_Id = req.cookies.user_id;
   const id = req.params.id;
-  const longURL = urlDatabase[id];
+  const longURL = urlDatabase[id].longURL;
   const urlUserID = urlDatabase[id].userID;
   if (!user_Id) {
     return res.send("Error you cannot edit URLS if are not logged in.");
@@ -168,12 +179,6 @@ app.get("/urls/:id", (req, res) => {
         return res.render("urls_show", templateVars);
     }
         return res.send("Error you do not own this URL.");
-});
-
-app.post("/urls/:id", (req, res) => {
-  const id = req.params.id;
-  urlDatabase[id].longURL = req.body.longURL;
-  return res.redirect("/urls");
 });
 
 app.post("/urls/:id", (req, res) => {
