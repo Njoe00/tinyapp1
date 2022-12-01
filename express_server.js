@@ -1,13 +1,22 @@
+const cookieSession = require('cookie-session');
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const app = express();
 const bcrypt = require("bcryptjs");
-const password = "123"
-const hashPass = bcrypt.hashSync(password, password.length)
+const password = "123";
+const hashPass = bcrypt.hashSync(password, password.length);
+
+app.use(cookieSession({
+  name: 'session',
+  keys: ["Dance-Monkey"],
+}));
+
 
 const PORT = 8080;
 app.set("view engine", "ejs");
 app.use(express.urlencoded({extended:true}));
+
+
 
 app.use(cookieParser());
 
@@ -62,7 +71,7 @@ const users = {
 
 
 app.get("/urls", (req, res) => {
-  const userId = req.cookies.user_id;
+  const userId = req.session.user_id;
 
   if (userId) {
     const username = users[userId];
@@ -133,9 +142,10 @@ app.post("/register", (req, res) => {
   }
   if (!getUserByEmail(email)) {
     const password = req.body.password;
-    users[id] = {id, email, hashPass};
-    console.log(hashPass);
-    res.cookie("user_id", id);
+    const hashPass2 = bcrypt.hashSync(password, password.length);
+    users[id] = {id, email, password: hashPass2};
+    // res.cookie("user_id", id);
+    req.session.user_id = users[id].id;
     return res.redirect("/urls");
   }
   return res.send("Status Code 400");
@@ -145,9 +155,10 @@ app.post("/login", (req, res) => {
   const email = req.body.email;
   const user = getUserByEmail(email);
   if (user) {
-    const password = req.body.password
-    if (bcrypt.compareSync(password, hashPass)) {
-      res.cookie("user_id", user.id);
+    const password = req.body.password;
+    if (bcrypt.compareSync(password, user.password)) {
+    //   res.cookie("user_id1", user.id);
+      req.session.user_id = user.id;
       return res.redirect("/urls");
     }
   }
