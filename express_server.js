@@ -1,6 +1,7 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const app = express();
+const bcrypt = require("bcryptjs");
 
 const PORT = 8080;
 app.set("view engine", "ejs");
@@ -22,13 +23,13 @@ const getUserByEmail = (email) => {
 };
 
 const urlsForUsers = (id) => {
-    let result = {};
-    for (let key in urlDatabase ) {
-        if (urlDatabase[key].userID === id) {
-            result[key] = urlDatabase[key];
-        }
+  let result = {};
+  for (let key in urlDatabase) {
+    if (urlDatabase[key].userID === id) {
+      result[key] = urlDatabase[key];
     }
-    return result;
+  }
+  return result;
 };
 
 const urlDatabase = {
@@ -64,9 +65,9 @@ app.get("/urls", (req, res) => {
   if (userId) {
     const username = users[userId];
     const templateVars = {
-        urls: urlsForUsers(userId),
-        username
-      }
+      urls: urlsForUsers(userId),
+      username
+    };
     return res.render("urls_index", templateVars);
   }
   return res.send("Error you need account to view URLs");
@@ -93,8 +94,8 @@ app.post("/urls/:id/delete" , (req, res) => {
   if (urlDatabase[id] === undefined) {
     return res.send("Error you cannot delete this URL because it does not exist.\n");
   }
-  console.log("user", user_id, "database", urlDatabase[id].userID)
-  if(user_id !== urlDatabase[id].userID) {
+  console.log("user", user_id, "database", urlDatabase[id].userID);
+  if (user_id !== urlDatabase[id].userID) {
     return res.send("Error you cannot delete this URL because it does not belong to you.\n");
   }
   delete urlDatabase[id];
@@ -129,7 +130,8 @@ app.post("/register", (req, res) => {
     return res.send("Status Code 400");
   }
   if (!getUserByEmail(email)) {
-    users[id] = {id, email, password};
+    const hashPass = bcrypt.hashSync(password, password.length)
+    users[id] = {id, email, hashPass};
     res.cookie("user_id", id);
     return res.redirect("/urls");
   }
@@ -173,12 +175,12 @@ app.get("/urls/:id", (req, res) => {
   if (!user_Id) {
     return res.send("Error you cannot edit URLS if are not logged in.");
 
-    }
-    if (urlUserID === user_Id) {
-        const templateVars = {urlUserID, id, longURL, username: users[user_Id]};
-        return res.render("urls_show", templateVars);
-    }
-        return res.send("Error you do not own this URL.");
+  }
+  if (urlUserID === user_Id) {
+    const templateVars = {urlUserID, id, longURL, username: users[user_Id]};
+    return res.render("urls_show", templateVars);
+  }
+  return res.send("Error you do not own this URL.");
 });
 
 app.post("/urls/:id", (req, res) => {
@@ -190,7 +192,7 @@ app.post("/urls/:id", (req, res) => {
   if (urlDatabase[id] === undefined) {
     return res.send("Error you cannot edit this URL because it does not exist.\n");
   }
-  if(user_id !== urlDatabase[id].userID) {
+  if (user_id !== urlDatabase[id].userID) {
     return res.send("Error you cannot edit this URL because it does not belong to you.\n");
   }
   return res.redirect(`/urls/${id}`);
