@@ -177,7 +177,7 @@ app.get("/login", (req, res) => {
 
 app.post("/logout", (req, res) => {
   const user_id = req.session.user_id;
-  res.clearCookie("user_id", user_id);
+  req.session = null;
   return res.redirect("/login");
 });
 
