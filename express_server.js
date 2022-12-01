@@ -201,11 +201,13 @@ app.post("/urls/:id", (req, res) => {
 
 app.get("/u/:id", (req, res) => {
   const id = req.params.id;
-  const longURL = urlDatabase[id].longURL;
-  if (longURL) {
-    return res.redirect(longURL);
+
+  if (!urlDatabase[id]) {
+    return res.send("This shortened URL does not exist");
   }
-  return res.send("This shortened URL does not exist");
+  const longURL = urlDatabase[id].longURL
+  return res.redirect(longURL);
+
 });
 
 
