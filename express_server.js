@@ -21,6 +21,16 @@ const getUserByEmail = (email) => {
   return null;
 };
 
+const urlsForUsers = (id) => {
+    let result = {};
+    for (let key in urlDatabase ) {
+        if (urlDatabase[key].userID === id) {
+            result[key] = urlDatabase[key];
+        }
+    }
+    return result;
+};
+
 const urlDatabase = {
   "b2xVn2" : {
     longURL: "http://www.lighthouselabs.ca",
@@ -47,23 +57,19 @@ const users = {
   }
 };
 
-const urlsForUsers = (id) => {
-    let result = {};
-    for (let key in urlDatabase ) {
-        if (urlDatabase[key].userID === id) {
-            result[key] = urlDatabase[key];
-        }
-    }
-    return result;
-};
+
 app.get("/urls", (req, res) => {
   const userId = req.cookies.user_id;
-  const username = users[userId];
-  const templateVars = {
-    urls: urlsForUsers(userId),
-    username
-  };
-  return res.render("urls_index", templateVars);
+
+  if (userId) {
+    const username = users[userId];
+    const templateVars = {
+        urls: urlsForUsers(userId),
+        username
+      }
+    return res.render("urls_index", templateVars);
+  }
+  return res.send("Error you need account to view URLs");
 });
 
 app.post("/urls", (req, res) => {
