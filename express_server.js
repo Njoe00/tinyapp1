@@ -22,28 +22,45 @@ const getUserByEmail = (email) => {
 };
 
 const urlDatabase = {
-  "b2xVn2" : "http://www.lighthouselabs.ca",
-  "9sm5xK" : "http://www.google.com"
+  "b2xVn2" : {
+    longURL: "http://www.lighthouselabs.ca",
+    userID: "userRandomID",
+  },
+
+  "9sm5xK": {
+    longURL: "http://www.google.com",
+    userID: "user2RandomID",
+  },
+
 };
 
 const users = {
   userRandomID: {
     id: "userRandomID",
     email: "user@example.com",
-    password: "123"
+    password: "123",
   },
   user2RandomID: {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "321"
+    password: "321",
   }
 };
 
+const urlsForUsers = (id) => {
+    let result = {};
+    for (let key in urlDatabase ) {
+        if (urlDatabase[key].userID === id) {
+            result[key] = urlDatabase[key];
+        }
+    }
+    return result;
+};
 app.get("/urls", (req, res) => {
   const userId = req.cookies.user_id;
   const username = users[userId];
   const templateVars = {
-    urls: urlDatabase,
+    urls: urlsForUsers(userId),
     username
   };
   return res.render("urls_index", templateVars);
@@ -55,7 +72,7 @@ app.post("/urls", (req, res) => {
   if (user_id) {
     const id = generateRandomString();
     const longURL = req.body.longURL;
-    urlDatabase[id] = longURL;
+    urlDatabase[id] = {longURL: longURL, userID: user_id};
     return res.redirect(`/urls/${id}`);
   }
   return res.send("You must have account to shorten URLS \n");
@@ -132,29 +149,33 @@ app.post("/logout", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  const userId = req.cookies.user_id;
+  const user_Id = req.cookies.user_id;
   const id = req.params.id;
   const longURL = urlDatabase[id];
-  const templateVars = {id, longURL, username: users[userId]};
-  return res.render("urls_show", templateVars);
+  const urlUserID = urlDatabase[id].userID;
+    if(urlUserID === user_Id) {
+        const templateVars = {urlUserID, id, longURL, username: users[user_Id]};
+        return res.render("urls_show", templateVars);
+    }
+    return res.send("Error you do not own this yeah URL");
 });
 
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
-  urlDatabase[id] = req.body.longURL;
+  urlDatabase[id].longURL = req.body.longURL;
   return res.redirect("/urls");
 });
 
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
-  const longURL = urlDatabase[id];
+  const longURL = urlDatabase[id].longURL;
   return res.redirect(`/urls/${id}`);
 });
 
 
 app.get("/u/:id", (req, res) => {
   const id = req.params.id;
-  const longURL = urlDatabase[id];
+  const longURL = urlDatabase[id].longURL;
   if (longURL) {
     return res.redirect(longURL);
   }
