@@ -159,11 +159,15 @@ app.get("/urls/:id", (req, res) => {
   const id = req.params.id;
   const longURL = urlDatabase[id];
   const urlUserID = urlDatabase[id].userID;
-    if(urlUserID === user_Id) {
+  if (!user_Id) {
+    return res.send("Error you cannot edit URLS if are not logged in.");
+
+    }
+    if (urlUserID === user_Id) {
         const templateVars = {urlUserID, id, longURL, username: users[user_Id]};
         return res.render("urls_show", templateVars);
     }
-    return res.send("Error you do not own this yeah URL");
+        return res.send("Error you do not own this URL.");
 });
 
 app.post("/urls/:id", (req, res) => {
