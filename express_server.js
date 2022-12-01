@@ -1,10 +1,8 @@
 const cookieSession = require('cookie-session');
 const express = require("express");
-const cookieParser = require("cookie-parser");
 const app = express();
 const bcrypt = require("bcryptjs");
-const password = "123";
-const hashPass = bcrypt.hashSync(password, password.length);
+const {getUserByEmail} = require("./helpers");
 
 app.use(cookieSession({
   name: 'session',
@@ -18,19 +16,9 @@ app.use(express.urlencoded({extended:true}));
 
 
 
-app.use(cookieParser());
 
 const generateRandomString = () => {
   return (Math.random() + 1).toString(36).substring(6);
-};
-
-const getUserByEmail = (email) => {
-  for (let id in users) {
-    if (email === users[id].email) {
-      return users[id];
-    }
-  }
-  return null;
 };
 
 const urlsForUsers = (id) => {
@@ -140,11 +128,10 @@ app.post("/register", (req, res) => {
   if (email === "" || password === "") {
     return res.send("Status Code 400");
   }
-  if (!getUserByEmail(email)) {
+  if (!getUserByEmail(email, users)) {
     const password = req.body.password;
     const hashPass2 = bcrypt.hashSync(password, password.length);
     users[id] = {id, email, password: hashPass2};
-    // res.cookie("user_id", id);
     req.session.user_id = users[id].id;
     return res.redirect("/urls");
   }
@@ -153,11 +140,10 @@ app.post("/register", (req, res) => {
 
 app.post("/login", (req, res) => {
   const email = req.body.email;
-  const user = getUserByEmail(email);
+  const user = getUserByEmail(email, users);
   if (user) {
     const password = req.body.password;
     if (bcrypt.compareSync(password, user.password)) {
-    //   res.cookie("user_id1", user.id);
       req.session.user_id = user.id;
       return res.redirect("/urls");
     }
