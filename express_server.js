@@ -183,7 +183,16 @@ app.get("/urls/:id", (req, res) => {
 
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
-  const longURL = urlDatabase[id].longURL;
+  const user_id = req.cookies.user_id;
+  if (!user_id) {
+    return res.send("Error you cannot edit this URL because you are not logged in.\n");
+  }
+  if (urlDatabase[id] === undefined) {
+    return res.send("Error you cannot edit this URL because it does not exist.\n");
+  }
+  if(user_id !== urlDatabase[id].userID) {
+    return res.send("Error you cannot edit this URL because it does not belong to you.\n");
+  }
   return res.redirect(`/urls/${id}`);
 });
 
