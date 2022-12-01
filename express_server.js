@@ -85,7 +85,7 @@ app.get("/urls", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  const user_id = req.cookies.user_id;
+  const user_id = req.session.user_id;
     
   if (user_id) {
     const id = generateRandomString();
@@ -98,7 +98,7 @@ app.post("/urls", (req, res) => {
 
 app.post("/urls/:id/delete" , (req, res) => {
   const id = req.params.id;
-  const user_id = req.cookies.user_id;
+  const user_id = req.session.user_id;
   if (!user_id) {
     return res.send("Error you cannot delete this URL because you are not logged in.\n");
   }
@@ -114,7 +114,7 @@ app.post("/urls/:id/delete" , (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  const userId = req.cookies.user_id;
+  const userId = req.session.user_id;
 
   if (userId) {
     const templateVars = {username: users[userId]};
@@ -124,7 +124,7 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  const userId = req.cookies.user_id;
+  const userId = req.session.user_id;
   const templateVars = {username: userId};
   if (userId) {
     return res.redirect("/urls");
@@ -167,7 +167,7 @@ app.post("/login", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  const userId = req.cookies.user_id;
+  const userId = req.session.user_id;
   const templateVars = {username: userId};
   if (userId) {
     return res.redirect("/urls");
@@ -176,13 +176,13 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  const user_id = req.cookies.user_id;
+  const user_id = req.session.user_id;
   res.clearCookie("user_id", user_id);
   return res.redirect("/login");
 });
 
 app.get("/urls/:id", (req, res) => {
-  const user_Id = req.cookies.user_id;
+  const user_Id = req.session.user_id;
   const id = req.params.id;
   const longURL = urlDatabase[id].longURL;
   const urlUserID = urlDatabase[id].userID;
@@ -199,7 +199,7 @@ app.get("/urls/:id", (req, res) => {
 
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
-  const user_id = req.cookies.user_id;
+  const user_id = req.session.user_id;
   if (!user_id) {
     return res.send("Error you cannot edit this URL because you are not logged in.\n");
   }
