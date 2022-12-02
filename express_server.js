@@ -1,5 +1,5 @@
 
-// SERVER SET-UP 
+// SERVER SET-UP
 
 const cookieSession = require('cookie-session');
 const express = require("express");
@@ -8,22 +8,22 @@ const bcrypt = require("bcryptjs");
 
 
 const PORT = 8080;
-app.set( "view engine", "ejs" );
-app.use(express.urlencoded({ extended:true }));
+app.set("view engine", "ejs");
+app.use(express.urlencoded({ extended: true }));
 
 
 app.use(cookieSession({
   name: 'session',
-  keys:  ["Dance-Monkey" ],
+  keys: ["Dance-Monkey"],
 }));
 
 
 // HELPER FUNCTION IMPORTS
-const { getUserByEmail, generateRandomString, urlsForUsers } = require( "./helpers" );
+const { getUserByEmail, generateRandomString, urlsForUsers } = require("./helpers");
 
 // USER URLDATABASE
 const urlDatabase = {
-  "b2xVn2" : {
+  "b2xVn2": {
     longURL: "http://www.lighthouselabs.ca",
     userID: "userRandomID",
   },
@@ -68,13 +68,13 @@ app.get("/urls", (req, res) => {
 app.post("/urls", (req, res) => {
   // GET USER ID FROM SESSION
   const user_id = req.session.user_id;
-    
+
   if (user_id) {
     // Generate 6 digit id for database
     const id = generateRandomString();
     const longURL = req.body.longURL;
     //Create new urldatabase obj for user
-    urlDatabase[id] = {longURL, userID: user_id};
+    urlDatabase[id] = { longURL, userID: user_id };
     return res.redirect(`/urls/${id}`);
   }
   return res.send("You must have account to shorten URLS \n");
@@ -82,16 +82,14 @@ app.post("/urls", (req, res) => {
 
 
 // DELETE URLS ROUTE FOR SPECIFIC URLDATABASE OBJ
-app.post("/urls/:id/delete" , (req, res) => {
+app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
   const user_id = req.session.user_id;
   if (!user_id) {
     return res.send("Error you cannot delete this URL because you are not logged in.\n");
-  }
-  else if (urlDatabase[id] === undefined) {
+  } else if (urlDatabase[id] === undefined) {
     return res.send("Error you cannot delete this URL because it does not exist.\n");
-  }
-  else if (user_id !== urlDatabase[id].userID) {
+  } else if (user_id !== urlDatabase[id].userID) {
     return res.send("Error you cannot delete this URL because it does not belong to you.\n");
   }
   delete urlDatabase[id];
@@ -112,7 +110,7 @@ app.get("/urls/new", (req, res) => {
 // REGISTER USER GET ROUTE
 app.get("/register", (req, res) => {
   const userId = req.session.user_id;
-  const templateVars =  { username: userId };
+  const templateVars = { username: userId };
   //if existing cookie then redirect to /urls
   if (userId) {
     return res.redirect("/urls");
@@ -156,13 +154,13 @@ app.post("/login", (req, res) => {
     }
   }
   return res.send("Error Code 403 password or email is incorrect");
-  
+
 });
 
 // LOGIN GET ROUTE
 app.get("/login", (req, res) => {
   const userId = req.session.user_id;
-  const templateVars = {username: userId};
+  const templateVars = { username: userId };
   if (userId) {
     return res.redirect("/urls");
   }
@@ -177,7 +175,7 @@ app.post("/logout", (req, res) => {
 });
 
 
-// SHORT URL GET ROUTE 
+// SHORT URL GET ROUTE
 app.get("/urls/:id", (req, res) => {
   const user_Id = req.session.user_id;
   const id = req.params.id;
@@ -191,13 +189,13 @@ app.get("/urls/:id", (req, res) => {
     return res.send("Error you cannot edit URLS if are not logged in.");
   }
   if (urlUserID === user_Id) {
-    const templateVars = {urlUserID, id, longURL, username: users[user_Id]};
+    const templateVars = { urlUserID, id, longURL, username: users[user_Id] };
     return res.render("urls_show", templateVars);
   }
   return res.send("Error you do not own this URL.");
 });
 
-// SHORT URL POST ROUTE 
+// SHORT URL POST ROUTE
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
   const user_id = req.session.user_id;
@@ -233,7 +231,7 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
-app.get("/urls.json" , (req, res) => {
+app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 

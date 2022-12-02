@@ -23,9 +23,9 @@ const urlsForUsers = (id, database) => {
   }
   return result;
 };
-  
 
 
-  
 
-module.exports = {getUserByEmail, generateRandomString, urlsForUsers};
+
+
+module.exports = { getUserByEmail, generateRandomString, urlsForUsers };
