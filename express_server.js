@@ -1,13 +1,10 @@
+
+// SERVER SET-UP 
+
 const cookieSession = require('cookie-session');
 const express = require("express");
 const app = express();
 const bcrypt = require("bcryptjs");
-const {getUserByEmail} = require("./helpers");
-
-app.use(cookieSession({
-  name: 'session',
-  keys: ["Dance-Monkey"],
-}));
 
 
 const PORT = 8080;
@@ -15,22 +12,16 @@ app.set("view engine", "ejs");
 app.use(express.urlencoded({extended:true}));
 
 
+app.use(cookieSession({
+  name: 'session',
+  keys: ["Dance-Monkey"],
+}));
 
 
-const generateRandomString = () => {
-  return (Math.random() + 1).toString(36).substring(6);
-};
+// HELPER FUNCTION IMPORTS
+const {getUserByEmail, generateRandomString, urlsForUsers} = require("./helpers");
 
-const urlsForUsers = (id) => {
-  let result = {};
-  for (let key in urlDatabase) {
-    if (urlDatabase[key].userID === id) {
-      result[key] = urlDatabase[key];
-    }
-  }
-  return result;
-};
-
+// USER AND URL DATABASES
 const urlDatabase = {
   "b2xVn2" : {
     longURL: "http://www.lighthouselabs.ca",
@@ -57,19 +48,20 @@ const users = {
   }
 };
 
+// URL INDEX PAGE
 
 app.get("/urls", (req, res) => {
-  const userId = req.session.user_id;
+  const user_id = req.session.user_id;
 
-  if (userId) {
-    const username = users[userId];
+  if (user_id) {
+    const username = users[user_id];
     const templateVars = {
-      urls: urlsForUsers(userId),
-      username
+      urls: urlsForUsers(user_id, urlDatabase),
+      username,
     };
     return res.render("urls_index", templateVars);
   }
-  return res.send("Error you need account to view URLs");
+  return res.send("Error you need account to view URLs\n");
 });
 
 app.post("/urls", (req, res) => {
@@ -78,12 +70,14 @@ app.post("/urls", (req, res) => {
   if (user_id) {
     const id = generateRandomString();
     const longURL = req.body.longURL;
-    urlDatabase[id] = {longURL: longURL, userID: user_id};
+    urlDatabase[id] = {longURL, userID: user_id};
     return res.redirect(`/urls/${id}`);
   }
   return res.send("You must have account to shorten URLS \n");
 });
 
+
+// DELETE URLS PATH
 app.post("/urls/:id/delete" , (req, res) => {
   const id = req.params.id;
   const user_id = req.session.user_id;
@@ -102,15 +96,17 @@ app.post("/urls/:id/delete" , (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  const userId = req.session.user_id;
+  const user_id = req.session.user_id;
 
-  if (userId) {
-    const templateVars = {username: users[userId]};
+  if (user_id) {
+    const templateVars = {username: users[user_id]};
     return res.render("urls_new", templateVars);
   }
   return res.redirect("/login");
 });
 
+
+// REGISTER USER PATH
 app.get("/register", (req, res) => {
   const userId = req.session.user_id;
   const templateVars = {username: userId};
@@ -138,6 +134,8 @@ app.post("/register", (req, res) => {
   return res.send("Status Code 400");
 });
 
+
+// LOGIN USER PATH
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const user = getUserByEmail(email, users);
@@ -161,20 +159,26 @@ app.get("/login", (req, res) => {
   return res.render("urls_login", templateVars);
 });
 
+
+// LOGOUT USER PATH
 app.post("/logout", (req, res) => {
-  const user_id = req.session.user_id;
   req.session = null;
   return res.redirect("/login");
 });
 
+
+// SHORT URL PATHS
 app.get("/urls/:id", (req, res) => {
   const user_Id = req.session.user_id;
   const id = req.params.id;
   const longURL = urlDatabase[id].longURL;
   const urlUserID = urlDatabase[id].userID;
+
+  if (!urlDatabase[id]) {
+    return res.send("Error this URL does not exist");
+  }
   if (!user_Id) {
     return res.send("Error you cannot edit URLS if are not logged in.");
-
   }
   if (urlUserID === user_Id) {
     const templateVars = {urlUserID, id, longURL, username: users[user_Id]};
@@ -195,9 +199,10 @@ app.post("/urls/:id", (req, res) => {
   if (user_id !== urlDatabase[id].userID) {
     return res.send("Error you cannot edit this URL because it does not belong to you.\n");
   }
-  return res.redirect(`/urls/${id}`);
+  const longURL = req.body.longURL;
+  urlDatabase[id].longURL = longURL;
+  return res.redirect(`/urls`);
 });
-
 
 app.get("/u/:id", (req, res) => {
   const id = req.params.id;
@@ -205,9 +210,8 @@ app.get("/u/:id", (req, res) => {
   if (!urlDatabase[id]) {
     return res.send("This shortened URL does not exist");
   }
-  const longURL = urlDatabase[id].longURL
+  const longURL = urlDatabase[id].longURL;
   return res.redirect(longURL);
-
 });
 
 
