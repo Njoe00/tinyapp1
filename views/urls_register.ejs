@@ -14,25 +14,25 @@
   <body>
     <%- include ('partials/_header') %>
     <main style="margin: 1em;">
-        <h2>Create User</h2>
+      <h2>Create User</h2>
         <form class="form-inline" action="/register" method="POST">
-            <label for="email">Email</label>
+          <label for="email">Email</label>
+          <input
+            class="form-control"
+            type="email"
+            name="email"
+            placeholder="email"
+          />
+          <label for="password">password</label>
             <input
               class="form-control"
-              type="email"
-              name="email"
-              placeholder="email"
+              type="password"
+              name="password"
+              placeholder="password"
             />
-            <label for="password">password</label>
-              <input
-                class="form-control"
-                type="password"
-                name="password"
-                placeholder="password"
-              />
-            <button type="submit" class="btn btn-primary">register</button>
-          </form>
-      </main>
+          <button type="submit" class="btn btn-primary">register</button>
+        </form>
+    </main>
     <!-- Bootstrap JS -->
     <script
       src="https://code.jquery.com/jquery-3.3.1.slim.min.js"

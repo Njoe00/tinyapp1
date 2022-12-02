@@ -21,7 +21,7 @@ app.use(cookieSession({
 // HELPER FUNCTION IMPORTS
 const { getUserByEmail, generateRandomString, urlsForUsers } = require( "./helpers" );
 
-// USER AND URL DATABASES
+// USER URLDATABASE
 const urlDatabase = {
   "b2xVn2" : {
     longURL: "http://www.lighthouselabs.ca",
@@ -34,13 +34,14 @@ const urlDatabase = {
   },
 
 };
-
+// USER DATABSAE
 const users = {
   userRandomID: {
     id: "userRandomID",
     email: "user@example.com",
     password: "123",
   },
+
   user2RandomID: {
     id: "user2RandomID",
     email: "user2@example.com",
@@ -49,7 +50,6 @@ const users = {
 };
 
 // URL ROUTE FOR INDEX PAGE
-
 app.get("/urls", (req, res) => {
   const user_id = req.session.user_id;
 
@@ -70,10 +70,10 @@ app.post("/urls", (req, res) => {
   const user_id = req.session.user_id;
     
   if (user_id) {
-    // GENERATING RANDOM SIX DIGIT ID FOR URLDATABASE
+    // Generate 6 digit id for database
     const id = generateRandomString();
     const longURL = req.body.longURL;
-    //CREATE NEW URL_DATABASE OBJECT
+    //Create new urldatabase obj for user
     urlDatabase[id] = {longURL, userID: user_id};
     return res.redirect(`/urls/${id}`);
   }
@@ -112,7 +112,8 @@ app.get("/urls/new", (req, res) => {
 // REGISTER USER GET ROUTE
 app.get("/register", (req, res) => {
   const userId = req.session.user_id;
-  const templateVars =  {username: userId };
+  const templateVars =  { username: userId };
+  //if existing cookie then redirect to /urls
   if (userId) {
     return res.redirect("/urls");
   }
@@ -133,7 +134,7 @@ app.post("/register", (req, res) => {
     // create new user object with hashpassword, email,  & id
     const password = req.body.password;
     const hashPass2 = bcrypt.hashSync(password, password.length);
-    users[id] = {id, email, password: hashPass2};
+    users[id] = { id, email, password: hashPass2 };
     req.session.user_id = users[id].id;
     return res.redirect("/urls");
   }
@@ -145,7 +146,7 @@ app.post("/register", (req, res) => {
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const user = getUserByEmail(email, users);
-  // if email exists in userdata then do...
+  // if email exists in userdatabase then check passwords
   if (user) {
     const password = req.body.password;
     // if bcrypt returns true and the passwords match create user cookie and redirect to /urls
