@@ -8,18 +8,18 @@ const bcrypt = require("bcryptjs");
 
 
 const PORT = 8080;
-app.set("view engine", "ejs");
-app.use(express.urlencoded({extended:true}));
+app.set( "view engine", "ejs" );
+app.use(express.urlencoded({ extended:true }));
 
 
 app.use(cookieSession({
   name: 'session',
-  keys: ["Dance-Monkey"],
+  keys:  ["Dance-Monkey" ],
 }));
 
 
 // HELPER FUNCTION IMPORTS
-const {getUserByEmail, generateRandomString, urlsForUsers} = require("./helpers");
+const { getUserByEmail, generateRandomString, urlsForUsers } = require( "./helpers" );
 
 // USER AND URL DATABASES
 const urlDatabase = {
@@ -48,7 +48,7 @@ const users = {
   }
 };
 
-// URL INDEX PAGE
+// URL ROUTE FOR INDEX PAGE
 
 app.get("/urls", (req, res) => {
   const user_id = req.session.user_id;
@@ -64,12 +64,16 @@ app.get("/urls", (req, res) => {
   return res.send("Error you need account to view URLs\n");
 });
 
+// POST ROUTE FOR URLS INDEX
 app.post("/urls", (req, res) => {
+  // GET USER ID FROM SESSION
   const user_id = req.session.user_id;
     
   if (user_id) {
+    // GENERATING RANDOM SIX DIGIT ID FOR URLDATABASE
     const id = generateRandomString();
     const longURL = req.body.longURL;
+    //CREATE NEW URL_DATABASE OBJECT
     urlDatabase[id] = {longURL, userID: user_id};
     return res.redirect(`/urls/${id}`);
   }
@@ -77,54 +81,56 @@ app.post("/urls", (req, res) => {
 });
 
 
-// DELETE URLS PATH
+// DELETE URLS ROUTE FOR SPECIFIC URLDATABASE OBJ
 app.post("/urls/:id/delete" , (req, res) => {
   const id = req.params.id;
   const user_id = req.session.user_id;
   if (!user_id) {
     return res.send("Error you cannot delete this URL because you are not logged in.\n");
   }
-  if (urlDatabase[id] === undefined) {
+  else if (urlDatabase[id] === undefined) {
     return res.send("Error you cannot delete this URL because it does not exist.\n");
   }
-  console.log("user", user_id, "database", urlDatabase[id].userID);
-  if (user_id !== urlDatabase[id].userID) {
+  else if (user_id !== urlDatabase[id].userID) {
     return res.send("Error you cannot delete this URL because it does not belong to you.\n");
   }
   delete urlDatabase[id];
   return res.redirect("/urls");
 });
 
+// GET ROUTE FOR NEW URLS
 app.get("/urls/new", (req, res) => {
   const user_id = req.session.user_id;
-
   if (user_id) {
-    const templateVars = {username: users[user_id]};
+    const templateVars = { username: users[user_id] };
     return res.render("urls_new", templateVars);
   }
   return res.redirect("/login");
 });
 
 
-// REGISTER USER PATH
+// REGISTER USER GET ROUTE
 app.get("/register", (req, res) => {
   const userId = req.session.user_id;
-  const templateVars = {username: userId};
+  const templateVars =  {username: userId };
   if (userId) {
     return res.redirect("/urls");
   }
   return res.render("urls_register", templateVars);
 });
 
+// REGISTER USER POST ROUTE
 app.post("/register", (req, res) => {
   const id = generateRandomString();
   const email = req.body.email;
   const password = req.body.password;
- 
+  // if email or password is empty return error code
   if (email === "" || password === "") {
     return res.send("Status Code 400");
   }
+  //if there is no existing email in the database
   if (!getUserByEmail(email, users)) {
+    // create new user object with hashpassword, email,  & id
     const password = req.body.password;
     const hashPass2 = bcrypt.hashSync(password, password.length);
     users[id] = {id, email, password: hashPass2};
@@ -135,12 +141,14 @@ app.post("/register", (req, res) => {
 });
 
 
-// LOGIN USER PATH
+// LOGIN ROUTE POST
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const user = getUserByEmail(email, users);
+  // if email exists in userdata then do...
   if (user) {
     const password = req.body.password;
+    // if bcrypt returns true and the passwords match create user cookie and redirect to /urls
     if (bcrypt.compareSync(password, user.password)) {
       req.session.user_id = user.id;
       return res.redirect("/urls");
@@ -150,6 +158,7 @@ app.post("/login", (req, res) => {
   
 });
 
+// LOGIN GET ROUTE
 app.get("/login", (req, res) => {
   const userId = req.session.user_id;
   const templateVars = {username: userId};
@@ -160,14 +169,14 @@ app.get("/login", (req, res) => {
 });
 
 
-// LOGOUT USER PATH
+// LOGOUT USER POST ROUTE
 app.post("/logout", (req, res) => {
   req.session = null;
   return res.redirect("/login");
 });
 
 
-// SHORT URL PATHS
+// SHORT URL GET ROUTE 
 app.get("/urls/:id", (req, res) => {
   const user_Id = req.session.user_id;
   const id = req.params.id;
@@ -187,6 +196,7 @@ app.get("/urls/:id", (req, res) => {
   return res.send("Error you do not own this URL.");
 });
 
+// SHORT URL POST ROUTE 
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
   const user_id = req.session.user_id;
@@ -204,9 +214,10 @@ app.post("/urls/:id", (req, res) => {
   return res.redirect(`/urls`);
 });
 
+//LONGURL GET ROUTE TO REDIRCT TO LONGURL
 app.get("/u/:id", (req, res) => {
   const id = req.params.id;
-
+  // if URL does not exist in database return error
   if (!urlDatabase[id]) {
     return res.send("This shortened URL does not exist");
   }
@@ -216,13 +227,7 @@ app.get("/u/:id", (req, res) => {
 
 
 
-
-
-
-
-
-
-
+// TESTING ROUTES
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
