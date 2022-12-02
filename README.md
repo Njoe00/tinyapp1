@@ -33,7 +33,8 @@ TinyApp is a full stack web application built with Node and Express that allows 
 8. Your new shortened URL is created along with the Long URL verison!
 9. You can update your new URL with the `submit` button or the `edit` button on the main view page
 10. You can delete your URL with the `delete` button on the main page 
-
+11. Feel free to `logout` whenever your URLs are safe with us!
+12. If you have any burning questions or want to give me money please see my Github Crypto Wallet in my bio!
 
 
 

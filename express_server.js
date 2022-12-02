@@ -1,22 +1,18 @@
 
 // SERVER SET-UP
-
 const cookieSession = require('cookie-session');
 const express = require("express");
 const app = express();
 const bcrypt = require("bcryptjs");
 
-
 const PORT = 8080;
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
-
 
 app.use(cookieSession({
   name: 'session',
   keys: ["Dance-Monkey"],
 }));
-
 
 // HELPER FUNCTION IMPORTS
 const { getUserByEmail, generateRandomString, urlsForUsers } = require("./helpers");
@@ -34,6 +30,7 @@ const urlDatabase = {
   },
 
 };
+
 // USER DATABSAE
 const users = {
   userRandomID: {
@@ -80,7 +77,6 @@ app.post("/urls", (req, res) => {
   return res.send("You must have account to shorten URLS \n");
 });
 
-
 // DELETE URLS ROUTE FOR SPECIFIC URLDATABASE OBJ
 app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
@@ -105,7 +101,6 @@ app.get("/urls/new", (req, res) => {
   }
   return res.redirect("/login");
 });
-
 
 // REGISTER USER GET ROUTE
 app.get("/register", (req, res) => {
@@ -138,7 +133,6 @@ app.post("/register", (req, res) => {
   }
   return res.send("Status Code 400");
 });
-
 
 // LOGIN ROUTE POST
 app.post("/login", (req, res) => {
@@ -173,7 +167,6 @@ app.post("/logout", (req, res) => {
   req.session = null;
   return res.redirect("/login");
 });
-
 
 // SHORT URL GET ROUTE
 app.get("/urls/:id", (req, res) => {
@@ -223,8 +216,6 @@ app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[id].longURL;
   return res.redirect(longURL);
 });
-
-
 
 // TESTING ROUTES
 app.get("/", (req, res) => {
